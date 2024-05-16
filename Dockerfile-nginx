@@ -1,0 +1,28 @@
+# build stage
+FROM golang:1.22 as builder
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o /go-websocket
+
+FROM nginx:1.21
+
+COPY default.conf /etc/nginx/conf.d/
+
+# copy the binary from builder stage
+
+COPY --from=builder /go-websocket /go-websocket
+
+# start the app
+
+RUN chmod +x /go-websocket
+
+# run app and nginx
+
+CMD /go-websocket & nginx -g 'daemon off;'

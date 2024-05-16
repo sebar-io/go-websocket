@@ -1,0 +1,17 @@
+services:
+  php:
+    build: 
+      context: .
+      dockerfile: Dockerfile-php
+    volumes:
+      - ./web:/var/www/html
+  nginx:
+    build: 
+      context: .
+      dockerfile: Dockerfile-nginx
+    volumes:
+      - ./web:/var/www/html
+    ports:
+      - 80:80
+    depends_on:
+      - php
